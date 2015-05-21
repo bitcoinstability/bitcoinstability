@@ -1,0 +1,27 @@
+{
+    "name": "BitcoinStability",
+    "version": "0.0.1",
+    "author": "John Tible <john@jtibble.com>",
+    "description": "Project to chart bitcoin stability",
+    "contributors": [
+        {
+            "name": "John Tibble",
+            "email": "john@jtible.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bitcoinstability/bitcoinstability"
+    },
+    "keywords": [
+        "REST"
+    ],
+    "dependencies": {
+        "express": "4.12.4",
+        "body-parser": "1.12.4",
+        "request": "2.55.0"
+    },
+    "engines": {
+        "node": ">=0.6"
+    }
+}
