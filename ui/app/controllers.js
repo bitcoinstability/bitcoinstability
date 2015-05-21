@@ -1,4 +1,4 @@
-app.controller('HomeController', function($scope){
+app.controller('StabilityController', function($scope){
   $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
   $scope.series = ['Series A', 'Series B'];
   $scope.data = [

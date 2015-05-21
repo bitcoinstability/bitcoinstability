@@ -6,11 +6,17 @@ app.config(function($stateProvider, $urlRouterProvider) {
     
     $stateProvider.state('home', {
         url: "/home",
-        templateUrl: "app/home/home.html",
-        controller: 'HomeController'
+        templateUrl: "app/home/home.html"
     }).state('stability', {
         url: "/stability",
-        templateUrl: "app/stability/stability.html"
+        templateUrl: "app/stability/stability.html",
+        controller: 'StabilityController'
     });
     
+});
+
+app.directive('header', function(){
+    return {
+        templateUrl: 'app/header/header.html'
+    };
 });
