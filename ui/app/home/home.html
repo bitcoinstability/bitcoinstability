@@ -1,0 +1,16 @@
+<div ng-controller="HomeController" class="row">
+    <div class="col-xs-12 text-center">
+        <h1>Bitcoin Stability</h1>
+        <p>
+        This is the home of <a href="http://www.reddit.com/u/azop">Azop</a>'s charts and graphs describing the stability of the market price of Bitcoin.</p>
+
+        <p>
+            The source for this site can be found at <a href="http://github.com/bitcoinstability/bitcoinstability">Github</a>.
+        </p>
+
+        <canvas id="line" class="chart chart-line" data="data"
+          labels="labels" legend="true" series="series"
+          click="onClick">
+        </canvas>
+    </div>
+</div>
