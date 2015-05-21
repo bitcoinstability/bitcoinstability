@@ -1,0 +1,25 @@
+{
+  "name": "bitcoinstability",
+  "version": "0.0.1",
+  "homepage": "https://github.com/bitcoinstability/bitcoinstability",
+  "authors": [
+    "John Tibble <john.tibble@ge.com>"
+  ],
+  "description": "Tool for tracking the stability of bitcoin",
+  "main": "index.html",
+  "keywords": [
+    "bitcoin"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-chart": "git://github.com/jtblin/angular-chart.js#0.7.1",
+    "chartjs": "git://github.com/nnnick/Chart.js#1.0.2"
+  }
+}
