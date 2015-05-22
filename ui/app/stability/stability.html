@@ -1,8 +1,52 @@
 <h1>Stability Charts</h1>
 <div class="row">
+    <div class="col-xs-4">
+        
+        <p class="input-group">
+            <input type="text" 
+                   class="form-control"
+                   datepicker-popup="yyyy-MM-dd"  
+                   ng-model="startDate" 
+                   is-open="startDateOpened" 
+                   min-date="'2011-01-01'" 
+                   max-date="'2140-12-31'" 
+                   datepicker-options="datePickerOptions" 
+                   ng-required="true" 
+                   close-text="Close" 
+                   ng-change="fetchData()"/>
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="openStartDate($event)">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </span>
+        </p>
+    </div>
+    <div class="col-xs-1 text-center">to</div>
+    <div class="col-xs-4">
+    
+        <p class="input-group">
+            <input type="text" 
+                   class="form-control"
+                   datepicker-popup="yyyy-MM-dd"  
+                   ng-model="endDate" 
+                   is-open="endDateOpened" 
+                   min-date="'2011-01-01'" 
+                   max-date="'2140-12-31'" 
+                   datepicker-options="datePickerOptions" 
+                   ng-required="true" 
+                   close-text="Close" />
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="openEndDate($event)">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </span>
+        </p>
+    </div>
+</div>
+<div class="row">
     <div class="col-xs-12">
         <canvas id="line" class="chart chart-line" data="data"
-          labels="labels" legend="true" series="series"
+          labels="labels" legend="true" series="series" options="options"
           click="onClick">
         </canvas>
     </div>
