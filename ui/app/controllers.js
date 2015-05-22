@@ -1,11 +1,43 @@
-app.controller('StabilityController', function($scope){
-  $scope.labels = ["January", "February", "March", "April", "May", "June", "July"];
-  $scope.series = ['Series A', 'Series B'];
-  $scope.data = [
-    [65, 59, 80, 81, 56, 55, 40],
-    [28, 48, 40, 19, 86, 27, 90]
-  ];
-  $scope.onClick = function (points, evt) {
-    console.log(points, evt);
-  };
+app.controller('StabilityController', function($scope, $http){
+    
+    var start = '2012-01-01';
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = today.getMonth()+1;
+    
+    if( month < 10 ){
+        month = '0' + month;
+    }
+    
+    var day = today.getDate();
+    
+    if( day < 10 ){
+        day = '0' + day;
+    }
+    
+    var end = year + '-' + month + '-' + day;
+    
+    var url = 'http://localhost/pricedata?start=' + start + '&end=' + end;
+    
+    $http.get(url).success( function(data){
+        var labels = [];
+        var values = [];
+        
+        var step = 10;
+        var index = 0;
+        for( var i in data.bpi ){
+            if( index % step == 0){
+                labels.push(i);
+                values.push(data.bpi[i]);
+            }
+            index++;
+        }
+        
+        $scope.data = [values];
+        $scope.labels = labels;
+        $scope.series = ['Price Data'];
+        $scope.onClick = function (points, evt) {
+            console.log(points, evt);
+        };
+    });
 });
