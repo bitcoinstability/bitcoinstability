@@ -4,7 +4,6 @@ Home of the Bitcoin Stability Charts, inspired/supported by Reddit user "Azop" a
 If you want to join, PM jtibble on reddit, twitter, or here on Github
 
 # Current status:
-Price data displayed from CoinDesk API, with date-selection-filtering
+Price data and mock stability are displayed from CoinDesk's API. 
 
-![Screenshot](http://i.imgur.com/zKprLeb.png "WIP Screenshot")
-
+Try it out here: http://bitcoinstability.github.io/bitcoinstability/ui/
