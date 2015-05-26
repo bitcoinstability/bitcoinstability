@@ -10,7 +10,8 @@ app.controller('StabilityController', function($scope, $http){
         showScale: true,
         showTooltips: false,
         pointDot: false,
-        datasetStrokeWidth: 0.5
+        datasetStrokeWidth: 0.5,
+        scaleShowGridLines: false
     };
     
     $scope.datePickerOptions = {
@@ -57,22 +58,37 @@ app.controller('StabilityController', function($scope, $http){
             var labels = [];
             var priceValues = [];
             var stabilityValues = [];
-
-            // Don't show all the data unless there are less than 'limit' number of points
-            var limit = 50;
-            var step = Math.ceil(Object.keys(data.bpi).length / limit);
             
-            var index = 0;
-            for( var i in data.bpi ){
-                if( index % step == 0){
-                    labels.push(i);
-                    priceValues.push(data.bpi[i]);
-                    stabilityValues.push( data.bpi[i]/2 );
+            
+            var keys = Object.keys(data.bpi);
+
+            // Don't show all the labels because the graph gets too crowded
+            var axisLimit = 50;
+            var step;
+            if( keys.length < axisLimit ){
+                step = 1;
+            } else {
+                step = Math.floor(keys.length/axisLimit);
+            }
+            
+            for( var i=0; i<keys.length; i++){
+                if( i % step == 0){
+                    labels.push( keys[i] );
+                } else {
+                    labels.push('');
                 }
-                index++;
+                
+                var price = data.bpi[ keys[i] ];
+                priceValues.push(price);
+                
+                if( i > 0 ){
+                    var previousPrice = data.bpi[ keys[i-1] ];
+                
+                    stabilityValues.push( price/previousPrice );
+                }
             }
 
-            $scope.data = [stabilityValues, priceValues];
+            $scope.data = [priceValues];
             $scope.labels = labels;
             $scope.series = ['Stability (Mock)', 'Price (USD)'];
         });
