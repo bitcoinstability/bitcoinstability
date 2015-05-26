@@ -2,6 +2,16 @@ app.controller('StabilityController', function($scope, $http){
     
     $scope.startDate = new Date(2011, 0, 1);
     $scope.endDate = new Date();
+    $scope.onClick = function (points, evt) {
+        console.log(points, evt);
+    };
+    $scope.options = {
+        animation: false,
+        showScale: true,
+        showTooltips: false,
+        pointDot: false,
+        datasetStrokeWidth: 0.5
+    };
     
     $scope.datePickerOptions = {
         initDate: new Date(2011, 0, 1)
@@ -41,13 +51,14 @@ app.controller('StabilityController', function($scope, $http){
         var start = getFormattedDate( $scope.startDate );
         var end = getFormattedDate( $scope.endDate );
 
-        var url = 'http://localhost/pricedata?start=' + start + '&end=' + end;
+        var url = 'http://api.coindesk.com/v1/bpi/historical/close.json?start='+start+'&end='+end;
 
         $http.get(url).success( function(data){
             var labels = [];
-            var values = [];
+            var priceValues = [];
+            var stabilityValues = [];
 
-            // Don't show all the data unless there are less than N points
+            // Don't show all the data unless there are less than 'limit' number of points
             var limit = 50;
             var step = Math.ceil(Object.keys(data.bpi).length / limit);
             
@@ -55,24 +66,15 @@ app.controller('StabilityController', function($scope, $http){
             for( var i in data.bpi ){
                 if( index % step == 0){
                     labels.push(i);
-                    values.push(data.bpi[i]);
+                    priceValues.push(data.bpi[i]);
+                    stabilityValues.push( data.bpi[i]/2 );
                 }
                 index++;
             }
 
-            $scope.data = [values];
+            $scope.data = [stabilityValues, priceValues];
             $scope.labels = labels;
-            $scope.series = ['Price Data'];
-            $scope.onClick = function (points, evt) {
-                console.log(points, evt);
-            };
-            $scope.options = {
-                animation: false,
-                showScale: true,
-                showTooltips: false,
-                pointDot: false,
-                datasetStrokeWidth: 0.5
-            };
+            $scope.series = ['Stability (Mock)', 'Price (USD)'];
         });
         
     }
