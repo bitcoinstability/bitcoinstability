@@ -1,3 +1,10 @@
+app.controller('HomeController', function($scope){
+    $scope.expression = 'Stability(T) = {\\sqrt{\\frac{1}{N} \\sum_{i=T-N}^{T} (x_i - \\overline{x})^2}}^{-1}';
+    $scope.getLaTeX = function(input){
+        return input.toString();
+    };
+});
+
 app.controller('StabilityController', function($scope, $http){
     
     var chart;
