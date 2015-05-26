@@ -7,11 +7,13 @@ app.controller('StabilityController', function($scope, $http){
     };
     $scope.options = {
         animation: false,
-        showScale: true,
         showTooltips: false,
         pointDot: false,
         datasetStrokeWidth: 0.5,
         scaleShowGridLines: false,
+        bezierCurve : false,
+        
+        showScale: true,
         // Boolean - If we want to override with a hard coded scale
         scaleOverride: true,
 
