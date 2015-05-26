@@ -1,6 +1,6 @@
 app.controller('StabilityController', function($scope, $http){
     
-    $scope.startDate = new Date(2011, 0, 1);
+    $scope.startDate = new Date(2013, 0, 1);
     $scope.endDate = new Date();
     $scope.onClick = function (points, evt) {
         console.log(points, evt);
@@ -90,7 +90,7 @@ app.controller('StabilityController', function($scope, $http){
 
             $scope.data = [priceValues];
             $scope.labels = labels;
-            $scope.series = ['Stability (Mock)', 'Price (USD)'];
+            $scope.series = ['Price (USD)'];
         });
         
     }
