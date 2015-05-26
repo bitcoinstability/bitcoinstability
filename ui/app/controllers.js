@@ -28,9 +28,6 @@ app.controller('StabilityController', function($scope, $http){
         scaleStartValue: 0,
     };
     
-    //blue: #4F81BC
-    //orange: #F69547
-    
     $scope.datePickerOptions = {
         initDate: new Date(2011, 0, 1)
     };
@@ -55,7 +52,6 @@ app.controller('StabilityController', function($scope, $http){
             bezierCurve : false,
             showTooltips: false,
             pointDot: false,
-            datasetStrokeWidth: 0.5,
             scaleShowGridLines: false,
 
             // manually set scale
@@ -84,7 +80,7 @@ app.controller('StabilityController', function($scope, $http){
         // Remove previous chart
         if( chart ){
             chart.destroy();
-            chart = undefined;     
+            chart = undefined;
         }
         
         var dates = Object.keys(marketData.bpi);
@@ -118,19 +114,80 @@ app.controller('StabilityController', function($scope, $http){
             }
         }
         
-        var hue = 212; // excel-blue
+        /////////////////////////////////
+        // STABILITY CALCULATIONS
+        // TODO: GET FROM /u/AZOP!
+        // CURRENT: (stddev of last 6 values) ^ -1
+        /////////////////////////////////     
+                        
+        // Set N = 6
+        var valueCount = 6;
+        
+        var stabilityData = [];
+        for( var i=0; i<valueCount; i++){
+            stabilityData.push(1);
+        }
+        
+        for( var i=valueCount; i<dates.length; i++){
+
+            // Average the last N values
+            var average = 0;
+            for( var j=1; j<= valueCount; j++ ){
+                var logprice = Math.log(prices[i-j]);
+                average += logprice;
+            }
+            average /= valueCount;
+
+            // Find standard deviation of last N values given the average
+            var sumSquredDifferences = 0;
+            for( var j=1; j<=valueCount; j++ ){
+                var price = Math.log(prices[i-j]);
+                sumSquredDifferences+= Math.pow( average - price, 2);
+            }
+
+            var standardDeviation = Math.sqrt( 1 / valueCount * sumSquredDifferences);
+
+            var stability = 1 / standardDeviation;
+
+            stabilityData.push(stability);
+
+        }
+              
+        ////////////////////////////////       
+        // END STABILITY CALCULATIONS
+        ////////////////////////////////       
+        
+        var blue = 'hsla(212,100%,40%,0.5)'; // Excel-blue #4F81BC
+        var orange = 'hsla(27,91%,62%,1.0)'; // Excel=orange #F69547
+        var clear = 'hsla(0, 0%, 0%, 0.0)';
         
         chartData.datasets.push( {
             label : 'Market Price ($)',
-            pointColor: 'hsla(' + hue + ',100%,40%,0.5)',
-            pointStrokeColor: 'hsla(' + hue + ',100%,40%,0.5)',
-            pointHighlightFill: 'hsla(' + hue + ',100%,40%,0.5)',
-            pointHighlightStroke: 'hsla(' + hue + ',100%,40%,0.5)',
-            fillColor : 'hsla(' + hue + ',100%,40%,0.5)',
-            strokeColor : 'hsla(' + hue + ',100%,40%,0.5)',
-            highlightFill : 'hsla(' + hue + ',100%,20%,0.5)',
-            highlightStroke : 'hsla(' + hue + ',100%,20%,0.5)',
+            pointColor: blue,
+            pointStrokeColor: blue,
+            pointHighlightFill: blue,
+            pointHighlightStroke: blue,
+            fillColor : clear,
+            strokeColor : blue,
+            highlightFill : blue,
+            highlightStroke : blue,
+            datasetStrokeWidth: 0.5,
             data : prices
+        });
+        
+        
+        chartData.datasets.push( {
+            label : 'Stability',
+            pointColor: clear,
+            pointStrokeColor: clear,
+            pointHighlightFill: clear,
+            pointHighlightStroke: clear,
+            fillColor : clear,
+            strokeColor : orange,
+            highlightFill : clear,
+            highlightStroke : clear,
+            datasetStrokeWidth: 2,
+            data : stabilityData
         });
         
         chart = renderChart(chartData);
