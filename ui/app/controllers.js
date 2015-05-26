@@ -11,7 +11,17 @@ app.controller('StabilityController', function($scope, $http){
         showTooltips: false,
         pointDot: false,
         datasetStrokeWidth: 0.5,
-        scaleShowGridLines: false
+        scaleShowGridLines: false,
+        // Boolean - If we want to override with a hard coded scale
+        scaleOverride: true,
+
+        // ** Required if scaleOverride is true **
+        // Number - The number of steps in a hard coded scale
+        scaleSteps: 13,
+        // Number - The value jump in the hard coded scale
+        scaleStepWidth: 100,
+        // Number - The scale starting value
+        scaleStartValue: 0,
     };
     
     $scope.datePickerOptions = {
