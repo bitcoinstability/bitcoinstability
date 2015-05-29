@@ -1,27 +1,26 @@
-app.controller('HomeController', function($scope){
+app.controller('HomeController', function ($scope) {
     $scope.expression = 'Stability(T) = {\\sqrt{\\frac{1}{N} \\sum_{i=T-N}^{T} (x_i - \\overline{x})^2}}^{-1}';
-    $scope.getLaTeX = function(input){
+    $scope.getLaTeX = function (input) {
         return input.toString();
     };
 });
 
-app.controller('StabilityController', function($scope, $http){
-    
+app.controller('StabilityController', function ($scope, PriceProvider, $q) {
+
     var chart;
-    
+
     $scope.startDate = new Date(2013, 0, 1);
     $scope.endDate = new Date();
-    $scope.onClick = function (points, evt) {
-        console.log(points, evt);
-    };
+    $scope.stabilitySeries = 'weighted';
+    
     $scope.options = {
         animation: false,
         showTooltips: false,
         pointDot: false,
         datasetStrokeWidth: 0.5,
         scaleShowGridLines: false,
-        bezierCurve : false,
-        
+        bezierCurve: false,
+
         showScale: true,
         // Boolean - If we want to override with a hard coded scale
         scaleOverride: true,
@@ -34,29 +33,36 @@ app.controller('StabilityController', function($scope, $http){
         // Number - The scale starting value
         scaleStartValue: 0,
     };
-    
+
     $scope.datePickerOptions = {
         initDate: new Date(2011, 0, 1)
     };
-    
-    $scope.openStartDate = function($event){
+
+    $scope.openStartDate = function ($event) {
         $event.preventDefault();
         $event.stopPropagation();
 
-        $scope.startDateOpened = true;  
+        $scope.startDateOpened = true;
     }
-    $scope.openEndDate = function($event){
+    $scope.openEndDate = function ($event) {
         $event.preventDefault();
         $event.stopPropagation();
 
-        $scope.endDateOpened = true;  
+        $scope.endDateOpened = true;
     }
-    
-    var renderChart = function(data){
+
+    var renderChart = function (data) {
+
+        // Remove previous chart
+        if (chart) {
+            chart.destroy();
+            chart = undefined;
+        }
+
         var options = {
             // fancy stuff turned off
             animation: false,
-            bezierCurve : false,
+            bezierCurve: false,
             showTooltips: false,
             pointDot: false,
             scaleShowGridLines: false,
@@ -69,193 +75,202 @@ app.controller('StabilityController', function($scope, $http){
             scaleStartValue: 0,
             legendTemplate: '<% for (var i=0; i<datasets.length; i++){%><span class="chartLabel"><i style=\"color:<%=datasets[i].strokeColor%>\" class="fa fa-line-chart"></i><%if(datasets[i].label){%><%=datasets[i].label%><%}%></span><%}%>'
         };
-        
+
         var element = document.getElementById('chart').getContext("2d");
-        
+
         // Fix for ChartJS resizing the canvas element by applying a device-resolution-derived scaling factor
-        if(!element.canvas.originalwidth) element.canvas.originalwidth = element.canvas.width;
-        if(!element.canvas.originalheight) element.canvas.originalheight = element.canvas.height;
+        if (!element.canvas.originalwidth) element.canvas.originalwidth = element.canvas.width;
+        if (!element.canvas.originalheight) element.canvas.originalheight = element.canvas.height;
 
         element.canvas.width = element.canvas.originalwidth;
         element.canvas.height = element.canvas.originalheight;
-        
-        chart = new Chart( element ).Line(data, options);
+
+        chart = new Chart(element).Line(data, options);
         document.getElementById('chartLegend').innerHTML = chart.generateLegend();
-        
+
     };
-    
-    var getStability = function( prices ){
-        // Find average log(price) in array
-        var average = 0;
-        for( var i in prices ){
-            average += Math.log(prices[i]);
-        }
-        average /= prices.length;
-        
-        // Find standard deviation of last N values given the average price
-        var sumSquredDifferences = 0;
-        for( var i in prices ){
-            var price = Math.log(prices[i]);
-            sumSquredDifferences+= Math.pow( average - price, 2);
-        }
 
-        var standardDeviation = Math.sqrt( 1 / prices.length * sumSquredDifferences );
+    var prepareChartData = function (labels, priceData, stabilitySeries) {
 
-        var stability = 1 / standardDeviation;
-
-        return stability;
-    }
-    
-    var calculateStabilities = function( priceData, timeframes ){
-        var collectedSeries = {};
-        
-        for( var i in timeframes ){
-            var seriesName = timeframes[i].toString();
-            collectedSeries[ seriesName ] = [];
-        }
-        
-        var stabilityData = [];
-        
-        for( var i=0; i<priceData.length; i++){
-
-            for( var j in timeframes ){
-                var seriesName = timeframes[j].toString();
-                var seriesPointCount = timeframes[j];
-                if( i < seriesPointCount ){
-                    collectedSeries[ seriesName ].push(0);
-                } else {
-                    var stability = getStability( priceData.slice( i-seriesPointCount, i));
-                    collectedSeries[ seriesName ].push( 4 * stability );
-                }
-            }
-        }
-            
-        return collectedSeries;
-    }
-    
-    var processData = function(marketData){
-        
-        // Remove previous chart
-        if( chart ){
-            chart.destroy();
-            chart = undefined;
-        }
-        
-        var dates = Object.keys(marketData.bpi);
-        var prices = [];
-        
-        for( var i in dates ){
-            prices.push( marketData.bpi[dates[i]] );
-        }
-        
         var chartData = {
             labels: [],
             datasets: []
         };
-        
-        
+
         // Add Labels
         // Don't show all the labels because the graph gets too crowded
         var axisLimit = 50;
         var step;
-        if( dates.length < axisLimit ){
+        if (labels.length < axisLimit) {
             step = 1;
         } else {
-            step = Math.floor(dates.length/axisLimit);
+            step = Math.floor(labels.length / axisLimit);
         }
 
-        for( var i=0; i<dates.length; i++){
-            if( i % step == 0){
-                chartData.labels.push( dates[i] );
+        for (var i = 0; i < labels.length; i++) {
+            if (i % step == 0) {
+                chartData.labels.push(labels[i]);
             } else {
                 chartData.labels.push('');
             }
-        }
-        
-        /////////////////////////////////
-        // STABILITY CALCULATIONS
-        // TODO: GET FROM /u/AZOP!
-        // CURRENT: (stddev of last 6 values) ^ -1
-        /////////////////////////////////     
-        var timeframes = [10, 14, 21, 31, 90];
-        var series = calculateStabilities(prices, timeframes);
-              
-        ////////////////////////////////       
-        // END STABILITY CALCULATIONS
-        ////////////////////////////////       
-        
-        var blue = 'hsla(212,100%,40%,0.5)'; // Excel-blue #4F81BC
-        var orange = 'hsla(27,91%,62%,1.0)'; // Excel=orange #F69547
+        }    
+
+        var blue = 'hsla(212,2%,40%,1.0)'; // Excel-blue #4F81BC
         var clear = 'hsla(0, 0%, 0%, 0.0)';
-        
-        var colors = {
-            '10': '#9ABA5B',
-            '14': '#8064A1',
-            '21': '#F69547',
-            '31': '#762B29',
-            '90': '#5E7431'
-        };
-        
-        chartData.datasets.push( {
-            label : 'Market Price ($)',
-            pointColor: blue,
-            pointStrokeColor: blue,
-            pointHighlightFill: blue,
-            pointHighlightStroke: blue,
-            fillColor : clear,
-            strokeColor : blue,
-            highlightFill : blue,
-            highlightStroke : blue,
-            datasetStrokeWidth: 0.5,
-            data : prices
-        });
-        
-        for( var i in timeframes ){
-            var seriesName = timeframes[i].toString();
-            
-            chartData.datasets.push( {
-                label : seriesName + '-Day Stability',
-                pointColor: clear,
-                pointStrokeColor: clear,
-                pointHighlightFill: clear,
-                pointHighlightStroke: clear,
-                fillColor : clear,
-                strokeColor : colors[seriesName],
-                highlightFill : clear,
-                highlightStroke : clear,
-                datasetStrokeWidth: 2,
-                data : series[seriesName]
+
+        // Render price data if available
+        if (priceData) {
+            chartData.datasets.push({
+                label: 'Market Price ($)',
+                pointColor: blue,
+                pointStrokeColor: blue,
+                pointHighlightFill: blue,
+                pointHighlightStroke: blue,
+                fillColor: clear,
+                strokeColor: blue,
+                highlightFill: blue,
+                highlightStroke: blue,
+                datasetStrokeWidth: 0.5,
+                data: priceData
             });
         }
-        
-        chart = renderChart(chartData);
+
+        // Render stability series if they are available
+        if (stabilitySeries) {
+
+            for (var i in stabilitySeries) {
+                var name = stabilitySeries[i].name;
+                var data = stabilitySeries[i].data;
+
+                var hue = Math.floor((i * 137.5 + 207) % 360);
+
+                chartData.datasets.push({
+                    label: name,
+                    pointColor: clear,
+                    pointStrokeColor: clear,
+                    pointHighlightFill: clear,
+                    pointHighlightStroke: clear,
+                    fillColor: clear,
+                    strokeColor: 'hsla(' + hue + ',100%,40%,0.5)',
+                    highlightFill: clear,
+                    highlightStroke: clear,
+                    datasetStrokeWidth: 2,
+                    data: data
+                });
+            }
+        }
+
+        return chartData;
+    };
+
+    $scope.addStabilitySeries = function (numberOfDays) {
+
+        PriceProvider.calculateStabilitySeries(numberOfDays).then(function (series) {
+
+            var priceData = PriceProvider.getPrices();
+            var labels = PriceProvider.getDates();
+            var chartData = prepareChartData(labels, priceData, [series])
+            renderChart(chartData);
+        });
+
     };
     
-    $scope.fetchData = function(){
-    
-        function getFormattedDate(date){
-            var year = date.getFullYear();
-            var month = date.getMonth()+1;
-            var day = date.getDate();
-            
-            if( month < 10 ){
-                month = '0' + month;
-            }
-            
-            if( day < 10 ){
-                day = '0' + day;
-            }
-            
-            return year + '-' + month + '-' + day;
+    $scope.showDefaultStabilitySeries = function(){
+        var days = [10, 14, 21, 30, 90];
+        var promises = [];
+        
+        for( var i in days ){
+            promises.push( PriceProvider.calculateStabilitySeries(days[i]));
         }
         
-        var start = getFormattedDate( $scope.startDate );
-        var end = getFormattedDate( $scope.endDate );
-
-        var url = 'http://api.coindesk.com/v1/bpi/historical/close.json?start='+start+'&end='+end;
-
-        $http.get(url).success( processData );
-    }
+        $q.all(promises).then( function(seriesArray){
+            
+            var priceData = PriceProvider.getPrices();
+            var labels = PriceProvider.getDates();
+            var chartData = prepareChartData(labels, priceData, seriesArray)
+            renderChart(chartData);
+        });
+        
+    };
     
-    $scope.fetchData();
+    $scope.showWeightedStabilitySeries = function(){
+        var promises = [];
+        var weightedSeries = {
+            name: 'Weighted Stability',
+            data: []
+        };
+        
+        // Calculate stability series data for N=7 to 31
+        for( var i=7; i<=31; i++ ){
+            promises.push( PriceProvider.calculateStabilitySeries(i));
+        }
+        
+        
+        $q.all(promises).then( function(seriesArray){
+
+            var numberOfDays = seriesArray[0].data.length;
+            
+            // Iterate for each day
+            for( var i=0; i<numberOfDays; i++ ){
+                
+                var weightedAverage = 0;
+                var divisor = 0;
+                
+                // Add weighted value to average
+                for( var j=0; j<seriesArray.length; j++ ){
+                    var series = seriesArray[j];
+                    var value = series.data[i];
+                    
+                    // N = j+7
+                    var weight = (j+7)*(j+7);
+                    weightedAverage += value * weight;
+                }
+                
+                // 7^2 + 8^2 + ... + 31^2                
+                weightedAverage /= 10325 ;
+                    
+                weightedSeries.data.push(weightedAverage);
+            }
+            
+            var priceData = PriceProvider.getPrices();
+            var labels = PriceProvider.getDates();
+            var chartData = prepareChartData(labels, priceData, [weightedSeries])
+            renderChart(chartData);
+        });
+        
+    };
+
+    $scope.fetchData = function () {
+        var deferred = $q.defer();
+        
+        PriceProvider.fetchPriceData($scope.startDate, $scope.endDate).then(function () {
+
+            var priceData = PriceProvider.getPrices();
+            var labels = PriceProvider.getDates();
+            var chartData = prepareChartData(labels, priceData);
+            renderChart(chartData);
+
+            deferred.resolve();
+        }, function (message) {
+            deferred.reject();
+            console.log(message);
+        });
+        
+        return deferred.promise;
+    };
+    
+    $scope.updateDataAndCharts = function(){
+        $scope.fetchData().then( $scope.updateStabilityCharts );
+    };
+
+    $scope.updateStabilityCharts = function(){
+        if( $scope.stabilitySeries === 'weighted' ){
+            $scope.showWeightedStabilitySeries();
+        } else {
+            $scope.showDefaultStabilitySeries();   
+        }
+    };
+    
+    $scope.updateDataAndCharts();
+    
 });

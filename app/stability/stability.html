@@ -1,56 +1,90 @@
 <div class="row">
     <div class="col-xs-12 text-center">
-    <h1><i class="fa fa-usd"></i>/<i class="fa fa-btc"></i> Stability</h1>
+    <h1>Bitcoin Price Stability</h1>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-xs-2 col-xs-offset-3">
-        
-        <p class="input-group">
-            <input type="text" 
-                   class="form-control"
-                   datepicker-popup="yyyy-MM-dd"  
-                   ng-model="startDate" 
-                   is-open="startDateOpened" 
-                   min-date="'2011-01-01'" 
-                   max-date="'2140-12-31'" 
-                   datepicker-options="datePickerOptions" 
-                   ng-required="true" 
-                   close-text="Close" 
-                   ng-change="fetchData()"/>
-            <span class="input-group-btn">
-                <button type="button" class="btn btn-default" ng-click="openStartDate($event)">
-                    <i class="fa fa-calendar"></i>
-                </button>
-            </span>
-        </p>
+    <div class="col-xs-6">
+        <div class="row">
+            <div class="col-xs-4 col-xs-offset-2">
+                    <p class="input-group">
+                    <input type="text" 
+                           class="form-control"
+                           datepicker-popup="yyyy-MM-dd"  
+                           ng-model="startDate" 
+                           is-open="startDateOpened" 
+                           min-date="'2011-01-01'" 
+                           max-date="'2140-12-31'" 
+                           datepicker-options="datePickerOptions" 
+                           ng-required="true" 
+                           close-text="Close" 
+                           ng-change="updateDataAndCharts()"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="openStartDate($event)">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </span>
+                </p>
+            </div>
+            <div class="col-xs-1 text-center">to</div>
+            <div class="col-xs-4">
+            
+                <p class="input-group">
+                    <input type="text" 
+                           class="form-control"
+                           datepicker-popup="yyyy-MM-dd"  
+                           ng-model="endDate" 
+                           is-open="endDateOpened" 
+                           min-date="'2011-01-01'" 
+                           max-date="'2140-12-31'" 
+                           datepicker-options="datePickerOptions" 
+                           ng-required="true" 
+                           close-text="Close" 
+                           ng-change="updateDataAndCharts()" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="openEndDate($event)">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </span>
+                </p>
+                
+            </div>
+        </div>
     </div>
-    <div class="col-xs-2 text-center">to</div>
-    <div class="col-xs-2">
-    
-        <p class="input-group">
-            <input type="text" 
-                   class="form-control"
-                   datepicker-popup="yyyy-MM-dd"  
-                   ng-model="endDate" 
-                   is-open="endDateOpened" 
-                   min-date="'2011-01-01'" 
-                   max-date="'2140-12-31'" 
-                   datepicker-options="datePickerOptions" 
-                   ng-required="true" 
-                   close-text="Close" />
-            <span class="input-group-btn">
-                <button type="button" class="btn btn-default" ng-click="openEndDate($event)">
-                    <i class="fa fa-calendar"></i>
-                </button>
-            </span>
-        </p>
+    <div class="col-xs-6">
+        <div class="row">
+            <div class="col-xs-12 text-center">
+            
+                <div class="btn-group">
+                    <label class="btn btn-default" 
+                           ng-model="stabilitySeries"
+                           ng-change="updateStabilityCharts()"
+                           btn-radio="'weighted'" 
+                           uncheckable>
+                        Weighted*
+                    </label>
+                    <label class="btn btn-default" 
+                           ng-model="stabilitySeries"
+                           ng-change="updateStabilityCharts()" 
+                           btn-radio="'component'" 
+                           uncheckable>
+                        Component
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+
 <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
         <canvas id="chart"></canvas>
         <div class="text-center" id="chartLegend"></div>
     </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 text-center">*Work-In-Progress Still!</div>
 </div>
