@@ -8,6 +8,7 @@ app.controller('HomeController', function ($scope) {
 app.controller('StabilityController', function ($scope, PriceProvider, $q) {
 
     var chart;
+    var scaleFactor = 6;
 
     $scope.startDate = new Date(2013, 0, 1);
     $scope.endDate = new Date();
@@ -89,6 +90,13 @@ app.controller('StabilityController', function ($scope, PriceProvider, $q) {
         document.getElementById('chartLegend').innerHTML = chart.generateLegend();
 
     };
+    
+    function scaleData(array){
+        for( var i in array ){
+            array[i] *= scaleFactor;
+        }
+        return array;
+    }
 
     var prepareChartData = function (labels, priceData, stabilitySeries) {
 
@@ -155,7 +163,7 @@ app.controller('StabilityController', function ($scope, PriceProvider, $q) {
                     highlightFill: clear,
                     highlightStroke: clear,
                     datasetStrokeWidth: 2,
-                    data: data
+                    data: scaleData(data)
                 });
             }
         }
