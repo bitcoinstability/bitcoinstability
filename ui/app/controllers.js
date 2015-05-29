@@ -82,6 +82,55 @@ app.controller('StabilityController', function($scope, $http){
         
     };
     
+    var getStability = function( prices ){
+        // Find average log(price) in array
+        var average = 0;
+        for( var i in prices ){
+            average += Math.log(prices[i]);
+        }
+        average /= prices.length;
+        
+        // Find standard deviation of last N values given the average price
+        var sumSquredDifferences = 0;
+        for( var i in prices ){
+            var price = Math.log(prices[i]);
+            sumSquredDifferences+= Math.pow( average - price, 2);
+        }
+
+        var standardDeviation = Math.sqrt( 1 / prices.length * sumSquredDifferences );
+
+        var stability = 1 / standardDeviation;
+
+        return stability;
+    }
+    
+    var calculateStabilities = function( priceData, timeframes ){
+        var collectedSeries = {};
+        
+        for( var i in timeframes ){
+            var seriesName = timeframes[i].toString();
+            collectedSeries[ seriesName ] = [];
+        }
+        
+        var stabilityData = [];
+        
+        for( var i=0; i<priceData.length; i++){
+
+            for( var j in timeframes ){
+                var seriesName = timeframes[j].toString();
+                var seriesPointCount = timeframes[j];
+                if( i < seriesPointCount ){
+                    collectedSeries[ seriesName ].push(0);
+                } else {
+                    var stability = getStability( priceData.slice( i-seriesPointCount, i));
+                    collectedSeries[ seriesName ].push( 4 * stability );
+                }
+            }
+        }
+            
+        return collectedSeries;
+    }
+    
     var processData = function(marketData){
         
         // Remove previous chart
@@ -126,39 +175,8 @@ app.controller('StabilityController', function($scope, $http){
         // TODO: GET FROM /u/AZOP!
         // CURRENT: (stddev of last 6 values) ^ -1
         /////////////////////////////////     
-                        
-        // Set N = 6
-        var valueCount = 6;
-        
-        var stabilityData = [];
-        for( var i=0; i<valueCount; i++){
-            stabilityData.push(1);
-        }
-        
-        for( var i=valueCount; i<dates.length; i++){
-
-            // Average the last N values
-            var average = 0;
-            for( var j=1; j<= valueCount; j++ ){
-                var logprice = Math.log(prices[i-j]);
-                average += logprice;
-            }
-            average /= valueCount;
-
-            // Find standard deviation of last N values given the average
-            var sumSquredDifferences = 0;
-            for( var j=1; j<=valueCount; j++ ){
-                var price = Math.log(prices[i-j]);
-                sumSquredDifferences+= Math.pow( average - price, 2);
-            }
-
-            var standardDeviation = Math.sqrt( 1 / valueCount * sumSquredDifferences);
-
-            var stability = 1 / standardDeviation;
-
-            stabilityData.push(stability);
-
-        }
+        var timeframes = [10, 14, 21, 31, 90];
+        var series = calculateStabilities(prices, timeframes);
               
         ////////////////////////////////       
         // END STABILITY CALCULATIONS
@@ -167,6 +185,14 @@ app.controller('StabilityController', function($scope, $http){
         var blue = 'hsla(212,100%,40%,0.5)'; // Excel-blue #4F81BC
         var orange = 'hsla(27,91%,62%,1.0)'; // Excel=orange #F69547
         var clear = 'hsla(0, 0%, 0%, 0.0)';
+        
+        var colors = {
+            '10': '#9ABA5B',
+            '14': '#8064A1',
+            '21': '#F69547',
+            '31': '#762B29',
+            '90': '#5E7431'
+        };
         
         chartData.datasets.push( {
             label : 'Market Price ($)',
@@ -182,20 +208,24 @@ app.controller('StabilityController', function($scope, $http){
             data : prices
         });
         
+        for( var i in timeframes ){
+            var seriesName = timeframes[i].toString();
         
-        chartData.datasets.push( {
-            label : 'Stability',
-            pointColor: clear,
-            pointStrokeColor: clear,
-            pointHighlightFill: clear,
-            pointHighlightStroke: clear,
-            fillColor : clear,
-            strokeColor : orange,
-            highlightFill : clear,
-            highlightStroke : clear,
-            datasetStrokeWidth: 2,
-            data : stabilityData
-        });
+        
+            chartData.datasets.push( {
+                label : 'Stability',
+                pointColor: clear,
+                pointStrokeColor: clear,
+                pointHighlightFill: clear,
+                pointHighlightStroke: clear,
+                fillColor : clear,
+                strokeColor : colors[seriesName],
+                highlightFill : clear,
+                highlightStroke : clear,
+                datasetStrokeWidth: 2,
+                data : series[seriesName]
+            });
+        }
         
         chart = renderChart(chartData);
     };
