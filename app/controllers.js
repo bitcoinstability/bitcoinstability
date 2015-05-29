@@ -67,6 +67,7 @@ app.controller('StabilityController', function($scope, $http){
             scaleSteps: 13,
             scaleStepWidth: 100,
             scaleStartValue: 0,
+            legendTemplate: '<% for (var i=0; i<datasets.length; i++){%><span class="chartLabel"><i style=\"color:<%=datasets[i].strokeColor%>\" class="fa fa-line-chart"></i><%if(datasets[i].label){%><%=datasets[i].label%><%}%></span><%}%>'
         };
         
         var element = document.getElementById('chart').getContext("2d");
@@ -78,7 +79,8 @@ app.controller('StabilityController', function($scope, $http){
         element.canvas.width = element.canvas.originalwidth;
         element.canvas.height = element.canvas.originalheight;
         
-        return new Chart( element ).Line(data, options);
+        chart = new Chart( element ).Line(data, options);
+        document.getElementById('chartLegend').innerHTML = chart.generateLegend();
         
     };
     
@@ -210,10 +212,9 @@ app.controller('StabilityController', function($scope, $http){
         
         for( var i in timeframes ){
             var seriesName = timeframes[i].toString();
-        
-        
+            
             chartData.datasets.push( {
-                label : 'Stability',
+                label : seriesName + '-Day Stability',
                 pointColor: clear,
                 pointStrokeColor: clear,
                 pointHighlightFill: clear,
