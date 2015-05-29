@@ -6,4 +6,4 @@ If you want to join, PM jtibble on reddit, twitter, or here on Github
 # Current status:
 Price data and mock stability are displayed from CoinDesk's API. 
 
-Try it out here: http://bitcoinstability.github.io/bitcoinstability/ui/
+Try it out here: http://bitcoinstability.github.io/bitcoinstability/
