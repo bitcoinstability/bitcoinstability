@@ -62,7 +62,7 @@
                            ng-change="updateStabilityCharts()"
                            btn-radio="'weighted'" 
                            uncheckable>
-                        Weighted*
+                        Weighted
                     </label>
                     <label class="btn btn-default" 
                            ng-model="stabilitySeries"
@@ -78,13 +78,16 @@
 </div>
 
 
-<div class="row">
+<!--<div class="row">
     <div class="col-xs-10 col-xs-offset-1">
-        <canvas id="chart"></canvas>
+        <canvas class="chart" id="chart"></canvas>
         <div class="text-center" id="chartLegend"></div>
     </div>
 </div>
-<br><br>
+<br><br>-->
+
 <div class="row">
-    <div class="col-xs-12 text-center">* Work-In-Progress</div>
+    <div class="col-xs-10 col-xs-offset-1">
+        <div id="chart2" stability-chart class="chart" prices="prices" series="series"></div>
+    </div>
 </div>

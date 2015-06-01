@@ -13,27 +13,6 @@ app.controller('StabilityController', function ($scope, PriceProvider, $q) {
     $scope.startDate = new Date(2013, 0, 1);
     $scope.endDate = new Date();
     $scope.stabilitySeries = 'weighted';
-    
-    $scope.options = {
-        animation: false,
-        showTooltips: false,
-        pointDot: false,
-        datasetStrokeWidth: 0.5,
-        scaleShowGridLines: false,
-        bezierCurve: false,
-
-        showScale: true,
-        // Boolean - If we want to override with a hard coded scale
-        scaleOverride: true,
-
-        // ** Required if scaleOverride is true **
-        // Number - The number of steps in a hard coded scale
-        scaleSteps: 13,
-        // Number - The value jump in the hard coded scale
-        scaleStepWidth: 100,
-        // Number - The scale starting value
-        scaleStartValue: 0,
-    };
 
     $scope.datePickerOptions = {
         initDate: new Date(2011, 0, 1)
@@ -44,18 +23,28 @@ app.controller('StabilityController', function ($scope, PriceProvider, $q) {
         $event.stopPropagation();
 
         $scope.startDateOpened = true;
-    }
+    };
+    
     $scope.openEndDate = function ($event) {
         $event.preventDefault();
         $event.stopPropagation();
 
         $scope.endDateOpened = true;
-    }
+    };
+    
+    $scope.prices = [
+        13, 36, 1200, 600, 250, 200
+    ];
+    $scope.series = [
+        [1, 4, 3, 2, 4, 3],
+        [8, 2, 5, 4, 2, 6],
+        [9, 1, 3, 5, 2, 6]
+    ];
 
     var renderChart = function (data) {
 
         // Remove previous chart
-        if (chart) {
+        /*if (chart) {
             chart.destroy();
             chart = undefined;
         }
@@ -87,7 +76,32 @@ app.controller('StabilityController', function ($scope, PriceProvider, $q) {
         element.canvas.height = element.canvas.originalheight;
 
         chart = new Chart(element).Line(data, options);
-        document.getElementById('chartLegend').innerHTML = chart.generateLegend();
+        document.getElementById('chartLegend').innerHTML = chart.generateLegend();*/
+        
+        /*var container = document.createElement('div');
+        document.body.appendChild(container);
+        
+        var options = {
+            renderTo: container,
+            title: {
+                text: 'Chart reflow is set to true'
+            },
+
+            subtitle: {
+                text: 'When resizing the window or the frame, the chart should resize'
+            },
+
+
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+
+            series: [{
+                data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+            }]
+        };
+        
+        var chart2 = new Highcharts.Chart(options);*/
 
     };
     

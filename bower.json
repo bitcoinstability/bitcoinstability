@@ -21,6 +21,7 @@
   "dependencies": {
     "chartjs": "git://github.com/nnnick/Chart.js#1.0.2",
     "angular-bootstrap": "~0.13.0",
-    "angular-ui-router": "~0.2.15"
+    "angular-ui-router": "~0.2.15",
+    "highcharts-release": "git://github.com/highslide-software/highcharts-release#4.1.5"
   }
 }
