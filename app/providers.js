@@ -102,7 +102,7 @@ app.provider('PriceProvider', function(){
                                 var stability = this.calculateStabilityOfSet( priceSubset );
                                 stabilitySeries.push(stability);
                             } else {
-                                stabilitySeries.push(0);
+                                stabilitySeries.push(NaN);
                             }
                         }
 

@@ -10,31 +10,42 @@ app.directive('stabilityChart', function () {
         },
         link: function (scope, element, attrs) {
             
-            var formatData = function(prices, series){
-                var returnedSeries = [{
+            if( ! (scope.series && scope.prices) ){
+                return;
+            }
+            
+            var formatPrices = function(prices){
+                return { 
                     type: 'line',
-                    name: 'Bitcoin Price',
-                    data: prices,
+                    name: prices.name,
+                    data: prices.data,
                     color: 'black',
-                    pointStart: Date.UTC(2010, 0, 1),
-                    pointInterval: 24 * 3600 * 1000 // one day
-                }];
+                    pointStart: prices.startDate.getTime(),
+                    pointInterval: 24*3600*1000
+                };
+            };
+            
+            var formatSeries = function(series){
+                var returnedSeries = [];
                 
                 for( var i in series ){
                     var hue = Math.floor((i * 137.5 + 207) % 360);
                     
+                    var s = series[i];
+                    
                     returnedSeries.push( {
                         type: 'line',
-                        name: 'Bitcoin Price',
-                        data: series[i],
+                        name: s.name,
+                        data: s.data,
                         color: 'hsla(' + hue + ',100%,40%,0.5)',
-                        pointStart: Date.UTC(2010, 0, 1),
-                        pointInterval: 24 * 3600 * 1000 // one day
+                        pointStart: s.startDate.getTime()
                     });
                 }
                 
                 return returnedSeries;
             };
+            
+            //var joinedSeries = [formatPrices( scope.prices )].concat( formatSeries(scope.series));
 
             var chart = new Highcharts.Chart({
                 chart: {
@@ -44,45 +55,53 @@ app.directive('stabilityChart', function () {
                     plotShadow: false
                 },
                 title: {
-                    text: 'Bitcoin Price Stability'
+                    text: 'Test Graph'
                 },
                 tooltip: {
-                    pointFormat: '{series.name}: <b>{point.y}</b>',
-                    percentageDecimals: 1
+                    pointFormat: '{series.name}: <b>{point.y}</b>'
                 },
-                plotOptions: {
-                    /*pie: {
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true,
-                            color: '#000000',
-                            connectorColor: '#000000',
-                            formatter: function () {
-                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
-                            }
-                        }
-                    }*/
-                },
+                plotOptions: {},
                 xAxis: {
                     type: 'datetime',
+                    title: 'Date',
+                    //tickPixelInterval: 50,
+                    //tickInterval: 24 * 3600 * 1000,
                     units: [
                         [
-                            'day',
-                            [1]
+                            'month',
+                            [1, 3, 6]
                         ]
                     ]
                 },
-                series: formatData(scope.prices, scope.series)
+                series: []
             });
             
             scope.$watch("prices", function (newValue) {
-                var newData = formatData(newValue, scope.series);
-                chart.series[0].setData(newData, true);
+                if( !newValue.data ){ return; }
+                
+                // Remove all series
+                while( chart.series.length > 0 ) { 
+                    chart.series[0].remove( false );
+                }
+                
+                var newSeries = formatPrices( newValue );
+                chart.addSeries( newSeries );
             }, true);
+            
             scope.$watch("series", function (newValue) {
-                var newData = formatData(scope.price, newValue);
-                chart.series[0].setData(newData, true);
+                /*var newSeries = formatSeries(newValue);
+                
+                // Remove all series except for the price
+                while( chart.series.length > 1 ) { 
+                    chart.series[1].remove( false );
+                }
+                
+                for( var i in newSeries ){
+                    chart.addSeries( newSeries[i], false );
+                }
+                
+                chart.redraw();*/
+                
             }, true);
 
         }
