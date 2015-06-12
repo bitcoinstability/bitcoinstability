@@ -20,6 +20,7 @@ app.directive('stabilityChart', function () {
                     name: prices.name,
                     data: prices.data,
                     color: 'black',
+                    yAxis: 1,
                     pointStart: prices.startDate.getTime(),
                     pointInterval: 24*3600*1000
                 };
@@ -38,7 +39,9 @@ app.directive('stabilityChart', function () {
                         name: s.name,
                         data: s.data,
                         color: 'hsla(' + hue + ',100%,40%,0.5)',
-                        pointStart: s.startDate.getTime()
+                        yAxis: 0,
+                        pointStart: s.startDate.getTime(),
+                        pointInterval: 24*3600*1000
                     });
                 }
                 
@@ -55,7 +58,7 @@ app.directive('stabilityChart', function () {
                     plotShadow: false
                 },
                 title: {
-                    text: 'Test Graph'
+                    text: 'Bitcoin Price and Stability'
                 },
                 tooltip: {
                     pointFormat: '{series.name}: <b>{point.y}</b>'
@@ -64,16 +67,52 @@ app.directive('stabilityChart', function () {
                 xAxis: {
                     type: 'datetime',
                     title: 'Date',
-                    //tickPixelInterval: 50,
-                    //tickInterval: 24 * 3600 * 1000,
                     units: [
+                        [
+                            'day',
+                            [1]
+                        ],
                         [
                             'month',
                             [1, 3, 6]
                         ]
                     ]
                 },
-                series: []
+                yAxis: [{ // Primary yAxis
+                    gridLineWidth: 0,
+                    title: {
+                        text: 'Stability',
+                        style: {
+                            color: Highcharts.getOptions().colors[0]
+                        }
+                    },
+                    floor: 0,
+                    labels: {
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[0]
+                        }
+                    },
+                    opposite: true
+
+
+                }, { // Tertiary yAxis
+                    gridLineWidth: 0,
+                    title: {
+                        text: 'Bitcoin Price',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    },
+                    floor: 0,
+                    labels: {
+                        format: '${value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    }
+                }],
+                series: [{}, {}]
             });
             
             scope.$watch("prices", function (newValue) {
@@ -89,7 +128,10 @@ app.directive('stabilityChart', function () {
             }, true);
             
             scope.$watch("series", function (newValue) {
-                /*var newSeries = formatSeries(newValue);
+                
+                if( !newValue || !newValue.length ){ return; }
+                
+                var newSeries = formatSeries(newValue);
                 
                 // Remove all series except for the price
                 while( chart.series.length > 1 ) { 
@@ -97,10 +139,11 @@ app.directive('stabilityChart', function () {
                 }
                 
                 for( var i in newSeries ){
-                    chart.addSeries( newSeries[i], false );
+                    var s = newSeries[i];
+                    chart.addSeries( s, false );
                 }
                 
-                chart.redraw();*/
+                chart.redraw();
                 
             }, true);
 
