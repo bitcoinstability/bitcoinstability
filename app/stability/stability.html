@@ -4,8 +4,6 @@
     </div>
 </div>
 
-
-
 <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
         <div id="chart2" stability-chart class="chart" prices="prices" series="series" scale="chartScale"></div>
@@ -26,13 +24,13 @@
                    ng-model="stabilitySeries"
                    ng-change="updateStabilityCharts()"
                    btn-radio="'weighted'">
-                Weighted
+                Weighted Stability
             </label>
             <label class="btn btn-default" 
                    ng-model="stabilitySeries"
                    ng-change="updateStabilityCharts()" 
                    btn-radio="'component'" >
-                Component
+                Component Stability
             </label>
         </div>
 
@@ -48,12 +46,12 @@
             <label class="btn btn-default" 
                    ng-model="chartScale"
                    btn-radio="'linear'">
-                Linear
+                Linear Price
             </label>
             <label class="btn btn-default" 
                    ng-model="chartScale" 
                    btn-radio="'logarithmic'">
-                Logarithmic
+                Logarithmic Price
             </label>
         </div>
         
@@ -108,7 +106,4 @@
     </div>
 </div>
 
-<br>
-
-
-<br>
+<br><br>
