@@ -13,6 +13,7 @@ app.controller('StabilityController', function ($scope, PriceProvider, $q) {
     $scope.startDate = new Date(2013, 0, 1);
     $scope.endDate = new Date();
     $scope.stabilitySeries = 'weighted';
+    $scope.chartScale = 'linear';
 
     $scope.datePickerOptions = {
         initDate: new Date(2011, 0, 1)

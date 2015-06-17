@@ -4,7 +4,8 @@ app.directive('stabilityChart', function () {
         replace: true,
         scope: {
             series: '=',
-            prices: '='
+            prices: '=',
+            scale: '='
         },
         controller: function ($scope, $element, $attrs) {
         },
@@ -48,7 +49,6 @@ app.directive('stabilityChart', function () {
                 return returnedSeries;
             };
             
-            //var joinedSeries = [formatPrices( scope.prices )].concat( formatSeries(scope.series));
 
             var chart = new Highcharts.Chart({
                 chart: {
@@ -58,7 +58,7 @@ app.directive('stabilityChart', function () {
                     plotShadow: false
                 },
                 title: {
-                    text: 'Bitcoin Price and Stability'
+                    text: ''
                 },
                 tooltip: {
                     pointFormat: '{series.name}: <b>{point.y}</b>'
@@ -78,7 +78,7 @@ app.directive('stabilityChart', function () {
                         ]
                     ]
                 },
-                yAxis: [{ // Primary yAxis
+                yAxis: [{ // Right yAxis
                     gridLineWidth: 0,
                     title: {
                         text: 'Stability',
@@ -96,15 +96,18 @@ app.directive('stabilityChart', function () {
                     opposite: true
 
 
-                }, { // Tertiary yAxis
+                }, { // Left yAxis
                     gridLineWidth: 0,
+                    type: scope.scale,
                     title: {
                         text: 'Bitcoin Price',
                         style: {
                             color: Highcharts.getOptions().colors[1]
                         }
                     },
-                    floor: 0,
+                    floor: 0, 
+                    max: 1500,
+                    ceiling: 1500,
                     labels: {
                         format: '${value}',
                         style: {
@@ -113,6 +116,15 @@ app.directive('stabilityChart', function () {
                     }
                 }],
                 series: [{}, {}]
+            });
+            
+            scope.$watch("scale", function(scale){
+                var options = {
+                    type: scale, 
+                    max: 1500
+                };
+                
+                chart.yAxis[1].update(options, true);
             });
             
             scope.$watch("prices", function (newValue) {
