@@ -3,7 +3,7 @@ Home of the Bitcoin Stability Charts, inspired/supported by Reddit user "Azop" a
 
 If you want to contribute, PM jtibble on reddit, twitter, or here on Github
 
-# Current status: Available
+# Current status: Restored
 
 Try it out at http://bitcoinstability.github.io/bitcoinstability/
 
